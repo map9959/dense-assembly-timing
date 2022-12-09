@@ -1,14 +1,5 @@
-//#include <igl/barycenter.h>
-//#include <igl/cotmatrix.h>
-//#include <igl/cotmatrix_entries.h>
-//#include <igl/doublearea.h>
-//#include <igl/grad.h>
-//#include <igl/jet.h>
-//#include <igl/massmatrix.h>
-//#include <igl/per_vertex_normals.h>
-//#include <igl/readDMAT.h>
+#include <igl/cotmatrix.h>
 #include <igl/readOFF.h>
-//#include <igl/repdiag.h>
 
 #include <iostream>
 #include <chrono>

@@ -56,7 +56,7 @@ IGL_INLINE void cotmatrix_dense(
   
     // Loop over triangles
     chrono::steady_clock::time_point begin_assembly = chrono::steady_clock::now();
-    /*
+    
     tbb::parallel_for(tbb::blocked_range<int>(0,F.rows()), [&](tbb::blocked_range<int> r){
     for(int i = r.begin(); i < r.end(); i++)
         {
@@ -72,8 +72,8 @@ IGL_INLINE void cotmatrix_dense(
         }
     }
     });
-    */
-  
+    
+    /*
     //#pragma omp parallel for num_threads(2)
     for(int i = 0; i < F.rows(); i++)
     {
@@ -88,7 +88,7 @@ IGL_INLINE void cotmatrix_dense(
             L(dest, dest) -= C(i,e);
         }
     }
-  
+    */
     chrono::steady_clock::time_point end_assembly = chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time_assembly = end_assembly-begin_assembly;
     std::cout << "time to assemble dense entries: " << time_assembly.count() << " ms" << endl;
