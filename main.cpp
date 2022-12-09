@@ -21,9 +21,9 @@ int main(int argc, char *argv[])
 
   // Load a mesh in OFF format
   //string filename = "cow.off";
-  string files[] = {"cow", "cube", "lion", "screwdriver"};
+  string files[] = {"cow", "cube", "lion", "screwdriver", "beetle"};
   for(string filename : files){
-    igl::readOFF("./data/" + filename + ".off", V, F);
+    igl::readOFF("../data/" + filename + ".off", V, F);
     std::cout << "results for " << filename << ".off:" << endl;
     
     // Compute Laplace-Beltrami operator: #V by #V
