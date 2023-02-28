@@ -40,5 +40,8 @@ int main(int argc, char *argv[])
     std::chrono::duration<double, std::milli> time_d = endd-begind;
     std::cout << "time to compute dense (total): " << time_d.count() << " ms" << endl;
     std::cout << "----" << endl;
+
+    //std::cout << L.block(0,0,5,5) << endl;
+    //std::cout << Ld.block(0,0,5,5) << endl;
   }
 }

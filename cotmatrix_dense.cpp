@@ -10,6 +10,8 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
+#include <tbb/parallel_for.h>
+
 template <typename DerivedV, typename DerivedF>
 IGL_INLINE void cotmatrix_dense(
   const Eigen::MatrixBase<DerivedV> & V, 
@@ -55,6 +57,24 @@ IGL_INLINE void cotmatrix_dense(
     std::cout << "time to compute dense cotangents: " << time_cot.count() << " ms" << endl;
   
     // Loop over triangles
+
+    //put matrix into cache
+    
+    for(int i = 0; i < F.rows(); i++)
+    {
+        // loop over edges of element
+        for(int e = 0;e<edges.rows();e++)
+        {
+            int source = F(i,edges(e,0));
+            int dest = F(i,edges(e,1));
+            L(source, dest) += 0.001;
+            L(dest, source) += 0.001;
+            L(source, source) -= 0.001;
+            L(dest, dest) -= 0.001;
+        }
+    }
+    
+
     chrono::steady_clock::time_point begin_assembly = chrono::steady_clock::now();
     
     /*
@@ -76,7 +96,7 @@ IGL_INLINE void cotmatrix_dense(
     */
     
     
-    //#pragma omp parallel for num_threads(128)
+    #pragma omp parallel for num_threads(16)
     for(int i = 0; i < F.rows(); i++)
     {
         // loop over edges of element
@@ -90,6 +110,7 @@ IGL_INLINE void cotmatrix_dense(
             L(dest, dest) -= C(i,e);
         }
     }
+    
     
     chrono::steady_clock::time_point end_assembly = chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time_assembly = end_assembly-begin_assembly;
