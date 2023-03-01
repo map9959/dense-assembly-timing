@@ -53,7 +53,7 @@ int main(int argc, char *argv[])
     chrono::steady_clock::time_point ends = chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time_s = ends-begins;
     //std::cout << "time to compute sparse (total): " << time_s.count() << " ms" << endl << endl;
-    std::cout << time_s.count() << " ";
+    //std::cout << time_s.count() << " ";
 
     Ld.resize(V.rows(),V.rows());
     chrono::steady_clock::time_point begind = chrono::steady_clock::now();
@@ -61,8 +61,11 @@ int main(int argc, char *argv[])
     chrono::steady_clock::time_point endd = chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time_d = endd-begind;
     //std::cout << "time to compute dense (total): " << time_d.count() << " ms" << endl;
-    std::cout << time_d.count() << " ";
+    //std::cout << time_d.count() << " ";
     //std::cout << "----" << endl;
+    if((L-Ld).norm() > pow(10.0, -10.0)){
+      std::cout << "WRONG! " << (L-Ld).norm();
+    }
     std::cout << endl;
 
     //std::cout << L.block(0,0,5,5) << endl;
