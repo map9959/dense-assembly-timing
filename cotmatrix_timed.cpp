@@ -64,7 +64,7 @@ IGL_INLINE void cotmatrix_timed(
   igl::cotmatrix_entries(V,F,C);
   chrono::steady_clock::time_point end_cot = chrono::steady_clock::now();
   std::chrono::duration<double, std::milli> time_cot = end_cot-begin_cot;
-  cout << "time to compute sparse cotangents: " << time_cot.count() << " ms" << endl;
+  //cout << "time to compute sparse cotangents: " << time_cot.count() << " ms" << endl;
   
   vector<Triplet<Scalar> > IJV;
   
@@ -86,16 +86,17 @@ IGL_INLINE void cotmatrix_timed(
   }
   chrono::steady_clock::time_point end_pushback = chrono::steady_clock::now();
   std::chrono::duration<double, std::milli> time_pushback = end_pushback-begin_pushback;
-  cout << "time to push sparse entries: " << time_pushback.count() << " ms" << endl;
+  //cout << "time to push sparse entries: " << time_pushback.count() << " ms" << endl;
   
   chrono::steady_clock::time_point begin_set = chrono::steady_clock::now();
   L.setFromTriplets(IJV.begin(),IJV.end());
   chrono::steady_clock::time_point end_set = chrono::steady_clock::now();
   std::chrono::duration<double, std::milli> time_set = end_set-begin_set;
-  cout << "time to set from triplets: " << time_set.count() << " ms" << endl;
+  //cout << "time to set from triplets: " << time_set.count() << " ms" << endl;
 
   std::chrono::duration<double, std::milli> time_assembly = end_set-begin_pushback;
-  cout << "total time to assemble sparse entries: " << time_assembly.count() << " ms" << endl;
+  //cout << "total time to assemble sparse entries: " << time_assembly.count() << " ms" << endl;
+  cout << time_assembly.count() << " ";
 }
 
 /*
