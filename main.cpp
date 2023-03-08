@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
   using namespace Eigen;
   using namespace std;
 
+  //setNbThreads(32);
+
   // Load a mesh in OFF format
   const filesystem::path models_folder{"/mnt/hdd1/michael/small-models"};
   for(auto const& dir_entry : filesystem::directory_iterator{models_folder}){
@@ -41,11 +43,11 @@ int main(int argc, char *argv[])
       igl::readOBJ(filename, V, F);
     }
     
-    if(V.rows() == 0){
+    if(V.rows() == 0 || V.rows() > 10000){
       continue;
     }
     //std::cout << "results for " << filename << ".off:" << endl;
-    std::cout << V.rows() << " ";
+    std::cout << V.rows() << " " << std::flush;
     
     // Compute Laplace-Beltrami operator: #V by #V
     chrono::steady_clock::time_point begins = chrono::steady_clock::now();
@@ -63,9 +65,13 @@ int main(int argc, char *argv[])
     //std::cout << "time to compute dense (total): " << time_d.count() << " ms" << endl;
     //std::cout << time_d.count() << " ";
     //std::cout << "----" << endl;
-    if((L-Ld).norm() > pow(10.0, -10.0)){
-      std::cout << "WRONG! " << (L-Ld).norm();
+    
+    //double diff_error = (L).norm()-(Ld).norm();
+    double diff_error = (L-Ld).norm();
+    if(diff_error > pow(10.0, -10.0)){
+      std::cout << "WRONG! " << diff_error;
     }
+
     std::cout << endl;
 
     //std::cout << L.block(0,0,5,5) << endl;

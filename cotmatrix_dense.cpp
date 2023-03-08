@@ -57,7 +57,7 @@ IGL_INLINE void cotmatrix_dense(
     //std::cout << "time to compute dense cotangents: " << time_cot.count() << " ms" << endl;
 
     //put matrix into cache
-    L.setZero();
+    //L.setZero();
     /*
     for(int i = 0; i < F.rows(); i++)
     {
@@ -66,16 +66,18 @@ IGL_INLINE void cotmatrix_dense(
         {
             int source = F(i,edges(e,0));
             int dest = F(i,edges(e,1));
-            L(source, dest) += 0;
-            L(dest, source) += 0;
-            L(source, source) -= 0;
-            L(dest, dest) -= 0;
+            L(source, dest) = 0;
+            L(dest, source) = 0;
+            L(source, source) = 0;
+            L(dest, dest) = 0;
         }
     }
     */
-
+    memset(L.derived().data(), 0, L.size()*sizeof(double));
     chrono::steady_clock::time_point begin_assembly = chrono::steady_clock::now();
     
+    //L.setZero();
+    memset(L.derived().data(), 0, L.size()*sizeof(double));
     // Loop over triangles
     
     /*
@@ -97,7 +99,8 @@ IGL_INLINE void cotmatrix_dense(
     */
     
     
-    //#pragma omp parallel for num_threads(16)
+    //#pragma omp parallel for num_threads(32)
+    
     for(int i = 0; i < F.rows(); i++)
     {
         // loop over edges of element
@@ -112,10 +115,12 @@ IGL_INLINE void cotmatrix_dense(
         }
     }
     
+    
     chrono::steady_clock::time_point end_assembly = chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time_assembly = end_assembly-begin_assembly;
     //std::cout << "time to assemble dense entries: " << time_assembly.count() << " ms" << endl;
-    std::cout << time_assembly.count() << " ";
+    //std::cout << time_assembly.count() << " " << std::flush;
+    std::cout << L.size() << " " << time_assembly.count() << " " << std::flush;
 }
 
 #ifdef IGL_STATIC_LIBRARY

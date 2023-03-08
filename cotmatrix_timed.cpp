@@ -68,8 +68,9 @@ IGL_INLINE void cotmatrix_timed(
   
   vector<Triplet<Scalar> > IJV;
   
-  IJV.reserve(F.rows()*edges.rows()*4);
+  
   chrono::steady_clock::time_point begin_pushback = chrono::steady_clock::now();
+  IJV.reserve(F.rows()*edges.rows()*4);
   // Loop over triangles
   for(int i = 0; i < F.rows(); i++)
   {
@@ -78,10 +79,10 @@ IGL_INLINE void cotmatrix_timed(
     {
       int source = F(i,edges(e,0));
       int dest = F(i,edges(e,1));
-      IJV.push_back(Triplet<Scalar>(source,dest,C(i,e)));
-      IJV.push_back(Triplet<Scalar>(dest,source,C(i,e)));
-      IJV.push_back(Triplet<Scalar>(source,source,-C(i,e)));
-      IJV.push_back(Triplet<Scalar>(dest,dest,-C(i,e)));
+      IJV.emplace_back(source,dest,C(i,e));
+      IJV.emplace_back(dest,source,C(i,e));
+      IJV.emplace_back(source,source,-C(i,e));
+      IJV.emplace_back(dest,dest,-C(i,e));
     }
   }
   chrono::steady_clock::time_point end_pushback = chrono::steady_clock::now();
@@ -96,7 +97,7 @@ IGL_INLINE void cotmatrix_timed(
 
   std::chrono::duration<double, std::milli> time_assembly = end_set-begin_pushback;
   //cout << "total time to assemble sparse entries: " << time_assembly.count() << " ms" << endl;
-  cout << time_assembly.count() << " ";
+  cout << time_assembly.count() << " " << std::flush;
 }
 
 /*
