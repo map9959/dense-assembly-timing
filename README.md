@@ -9,10 +9,6 @@ This program, given an input of a folder of STL, OFF, and OBJ models, outputs:
 
 Early results that only measured assembly were promising; indeed, assembly is about 2x faster for small models (n < 10000) when done densely, and solving may also be faster, but this speed increase is negligible when compared to the time it takes to load the matrix into cache and set all values to zero in the first place. The code to reproduce these results is provided. This experiment was done on a subset of [Thingi10k](https://ten-thousand-models.appspot.com/), a database of 10,000 models from Thingiverse.
 
-## Acknowledgements
-
-I would like to acknowledge [Thingi10k](https://ten-thousand-models.appspot.com/)
-
 ## Dependencies
 
 The only dependencies are STL, Eigen, [libigl](http://libigl.github.io/libigl/) and the dependencies
