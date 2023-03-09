@@ -10,8 +10,6 @@
 #include <Eigen/Dense>
 #include <Eigen/Sparse>
 
-#include <tbb/parallel_for.h>
-
 template <typename DerivedV, typename DerivedF>
 IGL_INLINE void cotmatrix_dense(
   const Eigen::MatrixBase<DerivedV> & V, 
@@ -48,59 +46,29 @@ IGL_INLINE void cotmatrix_dense(
     {
         return;
     }
+
     // Gather cotangents
     MatrixXd C;
-    chrono::steady_clock::time_point begin_cot = chrono::steady_clock::now();
     igl::cotmatrix_entries(V,F,C);
-    chrono::steady_clock::time_point end_cot = chrono::steady_clock::now();
-    std::chrono::duration<double, std::milli> time_cot = end_cot-begin_cot;
-    //std::cout << "time to compute dense cotangents: " << time_cot.count() << " ms" << endl;
 
-    //put matrix into cache
-    //L.setZero();
-    /*
-    for(int i = 0; i < F.rows(); i++)
-    {
-        // loop over edges of element
-        for(int e = 0;e<edges.rows();e++)
-        {
-            int source = F(i,edges(e,0));
-            int dest = F(i,edges(e,1));
-            L(source, dest) = 0;
-            L(dest, source) = 0;
-            L(source, source) = 0;
-            L(dest, dest) = 0;
-        }
-    }
-    */
-    memset(L.derived().data(), 0, L.size()*sizeof(double));
+    chrono::steady_clock::time_point before_cache = chrono::steady_clock::now();
+
+    // put matrix into cache by zeroing it
+    L.setZero();
+    //setZero() optimizes to memset in release mode
+    //memset(L.derived().data(), 0, L.size()*sizeof(double));
+
+    chrono::steady_clock::time_point after_cache = chrono::steady_clock::now();
+
+    //time it takes to zero matrix while already in cache
+    L.setZero();
+    //setZero() optimizes to memset in release mode
+    //memset(L.derived().data(), 0, L.size()*sizeof(double));
+
     chrono::steady_clock::time_point begin_assembly = chrono::steady_clock::now();
-    
-    //L.setZero();
-    memset(L.derived().data(), 0, L.size()*sizeof(double));
+
     // Loop over triangles
     
-    /*
-    tbb::parallel_for(tbb::blocked_range<int>(0,F.rows()), [&](tbb::blocked_range<int> r){
-    for(int i = r.begin(); i < r.end(); i++)
-        {
-        // loop over edges of element
-        for(int e = 0;e<edges.rows();e++)
-        {
-            int source = F(i,edges(e,0));
-            int dest = F(i,edges(e,1));
-            L(source, dest) += C(i,e);
-            L(dest, source) += C(i,e);
-            L(source, source) -= C(i,e);
-            L(dest, dest) -= C(i,e);
-        }
-    }
-    });
-    */
-    
-    
-    //#pragma omp parallel for num_threads(32)
-    
     for(int i = 0; i < F.rows(); i++)
     {
         // loop over edges of element
@@ -114,13 +82,13 @@ IGL_INLINE void cotmatrix_dense(
             L(dest, dest) -= C(i,e);
         }
     }
-    
-    
     chrono::steady_clock::time_point end_assembly = chrono::steady_clock::now();
     std::chrono::duration<double, std::milli> time_assembly = end_assembly-begin_assembly;
-    //std::cout << "time to assemble dense entries: " << time_assembly.count() << " ms" << endl;
-    //std::cout << time_assembly.count() << " " << std::flush;
-    std::cout << L.size() << " " << time_assembly.count() << " " << std::flush;
+    std::chrono::duration<double, std::milli> time_assembly_zeroed = end_assembly-after_cache;
+    std::chrono::duration<double, std::milli> time_assembly_uncached = end_assembly-before_cache;
+    std::cout << time_assembly.count() << " "
+    << time_assembly_zeroed.count() << " "
+    << time_assembly_uncached.count() << " " << std::flush;
 }
 
 #ifdef IGL_STATIC_LIBRARY
